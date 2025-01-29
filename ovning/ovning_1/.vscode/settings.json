@@ -2,7 +2,8 @@
     "C_Cpp.intelliSenseEngine": "default",
     "idf.espIdfPathWin": "C:\\Users\\Admin\\esp\\v5.4\\esp-idf",
     "idf.openOcdConfigs": [
-        "board/esp32c6-lpcore-builtin.cfg"
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32.cfg"
     ],
     "idf.toolsPathWin": "C:\\Users\\Admin\\.espressif"
 }
