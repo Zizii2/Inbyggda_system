@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include "esp_log.h"
 #include <inttypes.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
@@ -13,9 +14,12 @@
 #include "esp_flash.h"
 #include "esp_system.h"
 
+const static char *const TAG = "MAIN";
+
 void app_main(void)
 {
     printf("Hello world!\n");
+    ESP_LOGI(TAG, "Hello world for my %d time", 1);
 
     /* Print chip information */
     esp_chip_info_t chip_info;
@@ -48,5 +52,5 @@ void app_main(void)
     }
     printf("Restarting now.\n");
     fflush(stdout);
-    esp_restart();
+    // esp_restart();
 }

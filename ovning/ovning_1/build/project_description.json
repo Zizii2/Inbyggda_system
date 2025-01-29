@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "ovning_1",
-    "project_version":    "f26e7b9-dirty",
+    "project_version":    "0f087e4-dirty",
     "project_path":       "C:/repos/Inbyggda_system/ovning/ovning_1",
     "idf_path":           "C:/Users/Admin/esp/v5.4/esp-idf",
     "build_dir":          "C:/repos/Inbyggda_system/ovning/ovning_1/build",
