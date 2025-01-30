@@ -26,18 +26,21 @@
 #define PRINTF_COLOR(color, format_string, ...) \
     printf("%s" format_string "%s", color, ##__VA_ARGS__, ANSI_RESET NEW_LINE)
 
-#define PRINTF_GROUP_1(format, ... )\
-    PRINTF_COLOR(ANSI_BLUE, "[Group 1] "); \
+#define PRINTF_GROUP_1(format, format_group,... )\
+    PRINTF_COLOR(ANSI_BLUE, format_group); \
     PRINTF_COLOR(ANSI_RESET, format, ##__VA_ARGS__)
 
 /*
-    debug macros
+    debug macros:
+    __LINE__
+    __FILE__
 */
-// __LINE__
-//__FILE__
 #define PRINTF_COLOR_WITH_LINE(color, format_string, ...) \
     PRINTF_COLOR(ANSI_MAGENTA, "[%s:%d] ", __FILE__, __LINE__); \
-    PRINTF_COLOR(color, format_string, ##__VA_ARGS__)
+    PRINTF_COLOR(color, "MESSAGE: "); \
+    PRINTF_COLOR(ANSI_YELLOW, format_string, ##__VA_ARGS__)
+
+
 
 
 const static char *const TAG = "MAIN";
@@ -49,14 +52,15 @@ void app_main(void)
     //ESP_LOGW (för varningar)
     //ESP_LOGE (för errors)
 
-    const char *test_string = "test";
-    printf("%s%s%s",ANSI_RED, test_string, ANSI_RESET NEW_LINE);
-
+    const char *test_string = "test\n";
+    printf("%s%s%s",ANSI_RED, test_string, ANSI_RESET);
     PRINTF_COLOR(ANSI_BLUE, "%s" NEW_LINE, test_string);
 
-    PRINTF_GROUP_1("Hello world %d" NEW_LINE, 1);
+    PRINTF_GROUP_1("Hello world %d", "Group 1", 1);
+    for(int i=0; i<5; i++){
+        PRINTF_COLOR_WITH_LINE(ANSI_YELLOW, "\ridx: %d", i+1);
 
-    PRINTF_COLOR_WITH_LINE(ANSI_YELLOW, "HEHEHEEHhehehe" NEW_LINE);
+    }
 
 
 
