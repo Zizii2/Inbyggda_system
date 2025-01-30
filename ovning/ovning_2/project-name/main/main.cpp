@@ -2,7 +2,7 @@
 #include "helper_component.h"
 #include "printer.h"
 
-void app_main(void){
+extern "C" void app_main(void){
     func();
-    print();
+    p::print();
 }

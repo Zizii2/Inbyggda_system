@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "printer.h"
-
-void print(void)
+void p::print(void)
 {
     printf("Hello wolrd");
 }
