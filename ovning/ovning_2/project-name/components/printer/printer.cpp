@@ -2,6 +2,9 @@
 #include "printer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include <string>
+#include <iostream>
+#include "esp_log.h"
 
 #define PRINT_COLOR()
 
@@ -12,14 +15,18 @@ void print::printNumbers(int start, int stop)
     }
 }
 void print::takeTimeAndPrintEverySec(int time_limit){
-    int time_inc = 1000;
+    const int time_inc = 1000;
     printf("Wating");
     for(int time_curr = 0; time_curr<time_limit; time_curr+=time_inc){
-        printf(".");
-        vTaskDelay(pdMS_TO_TICKS(time_inc));
+        printf("\n.");
+        if(time_curr + time_inc <= time_limit){
+            vTaskDelay(pdMS_TO_TICKS(time_inc));
+        }
+        else{
+            vTaskDelay(pdMS_TO_TICKS(time_limit - time_curr));
+        }
     }
     printf("\n");
-
 }
 void print::multiply(int a, int b){
     printf("%d * %d = %d\n",a,b, a * b);
