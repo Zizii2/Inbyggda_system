@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../../components/helper_component"
+		}
+	],
+	"settings": {}
+}
