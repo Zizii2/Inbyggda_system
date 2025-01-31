@@ -5,7 +5,6 @@ namespace print{
     void printNumbers(int start, int stop);
     void takeTimeAndPrintEverySec(int time);
     void multiply(int a, int b);
-    
 }
 
 #endif
