@@ -1,67 +1,106 @@
 #include <stdio.h>
 #include "Button.h"
 
-#define TIME_TO_WAIT_FOR_DEBOUNCE pdMS_TO_TICKS(30)
-#define ON  (1)
-#define OFF (0)
-
 /// @brief Initializes the GPIO pins for the buttons
 /// @param new_intr the choosen interrupt type
 /// @param new_mode the choosen mode (mainly input or output)
 /// @param new_pull_up the pullup type (ENABLE or DISABLE)
 /// @param new_pull_down the pulldown type (ENABLE or DISABLE)
-/// @param varadic expected data type: `gpio_num_t` this arg is for the choosen the button pins by number
-/// @return `esp_err_t` ESP_OK = 0 or ESP_FAIL = -1
-button_handel init(gpio_int_type_t new_intr, gpio_mode_t new_mode, gpio_pullup_t new_pull_up, gpio_pulldown_t new_pull_down, gpio_num_t new_pin){
+/// @param gpio_num_t the choosen pin for the button
+/// @return `button_handel` or `NULL`
+
+/*
+    notes:
+    gpio_mode går att göra konstant, för idéen är väl att pinnen ska bara kunna ta emot data från knappen
+
+    med hur Potensiometer del går det kan är bara att ha något mer liknande gpio_config_t men bara minska valet så det är mer "streamlined"
+    DVS. göra min egna button_config_t som har mindre alternativ och är gjort bara för knappar
+*/
+button_handel init_button(gpio_int_type_t new_intr, gpio_pullup_t new_pull_up, gpio_pulldown_t new_pull_down, gpio_num_t new_pin){
     gpio_config_t button_config;
-    button_t *btn = (button_t*)malloc(sizeof(button_t));
+    button_handel btn = (button_handel)malloc(sizeof(button_t));
     if (GPIO_INTR_DISABLE <= new_intr && new_intr <= GPIO_INTR_MAX)
     { button_config.intr_type = new_intr; }
-    else { return ESP_FAIL; }
+    else { return NULL; }
 
-    if (GPIO_MODE_DISABLE <= new_mode && new_mode <= GPIO_MODE_INPUT_OUTPUT)
-    { button_config.mode = new_mode; }
-    else { return ESP_FAIL; }
+    button_config.mode = GPIO_MODE_INPUT;
 
     if (GPIO_PULLUP_DISABLE <= new_pull_up && new_pull_up <= GPIO_PULLUP_ENABLE)
     { button_config.pull_up_en = new_pull_up; }
-    else { return ESP_FAIL; }
+    else { return NULL; }
 
     if (GPIO_PULLDOWN_DISABLE <= new_pull_down && new_pull_down <= GPIO_PULLDOWN_ENABLE)
     { button_config.pull_down_en = new_pull_down; }
-    else { return ESP_FAIL; }
+    else { return NULL; }
 
     button_config.pin_bit_mask = 1ULL << new_pin;
     ESP_ERROR_CHECK(gpio_config(&button_config));
 
     // Initialize button_t struct
     btn->btn_pin = new_pin;
-    btn->latch = OFF;
+    btn->level = 0;
+    btn->latch = 0;
     return btn;
 }
+/*
+!   for(int i = 0; i < sizeof(int); i++)
+!    {
+!        printf("bit: %u\n", !!(btn->state_bit_mask & (1 << i)));
+!    }
+!    printf("\n");
+!
+!    btn->state_bit_mask = ALL_ON;
+!    for(int i = 0; i < sizeof(int); i++)
+!    {
+!        printf("bit: %u\n", !!(btn->state_bit_mask & (1 << i)));
+!    }
+!    printf("\n");
+!
+!    btn->state_bit_mask = LEVEL_ON;
+!    for(int i = 0; i < sizeof(int); i++)
+!    {
+!        printf("bit: %u\n", !!(btn->state_bit_mask & (1 << i)));
+!    }
+!    printf("\n");
+!
+!    btn->state_bit_mask = LATCH_ON;
+!    for(int i = 0; i < sizeof(int); i++)
+!    {
+!        printf("bit: %u\n", !!(btn->state_bit_mask & (1 << i)));
+!    }
+!    printf("\n");
+*/
 
-bool update(button_handel btn, TickType_t elapsed_time){
-    btn->level = gpio_get_level(btn->btn_pin);
+/*
+    elapsed_time skulle kunna vara en del av button_t
+    vilket skulle göra koden lite mer eligant (gömma mer av koden)
+*/
+bool update_button(button_handel btn, TickType_t curr_time){
+    int new_level = gpio_get_level(btn->btn_pin);
+    if (new_level !=  btn->level){
+        btn->last_updated = xTaskGetTickCount();
+        btn->level = new_level;
+    }
     if (btn->level == ON && btn->latch == OFF){        // Button goes from off to on
-        if (elapsed_time >= TIME_TO_WAIT_FOR_DEBOUNCE){ 
+        if (curr_time - btn->last_updated >= TIME_TO_WAIT_FOR_DEBOUNCE){ 
             btn->latch = ON;
             return true;
         }
     }
     else if (btn->level == OFF && btn->latch == ON){   // Button goes from on to off
-        if (elapsed_time >= TIME_TO_WAIT_FOR_DEBOUNCE){
-            btn->latch = OFF;
+        if (btn->last_updated >= TIME_TO_WAIT_FOR_DEBOUNCE){
+            btn->latch = ON;
             return true;
         }
     }
     return false;
 }
 
-bool isPressed(int latch){
-    return (latch == OFF) ? false : true;
+bool isPressed_button(button_handel btn){
+    return (btn->latch == ON) ? true : false;
+    return false;
 }
 
-void setOnPressed(void (*onPressed)(int)){
-    //? är det här tillåtet
-    //btn->cb = onPressed;
+void setOnPressed_button(button_handel btn, void (*onPressed)(int)){
+    btn->cb = onPressed;
 }
