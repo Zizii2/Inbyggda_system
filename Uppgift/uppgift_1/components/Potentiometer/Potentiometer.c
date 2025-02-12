@@ -54,18 +54,32 @@ static int arr_sum(int* arr, int size){
     for (int i=1; i < size; i++){
         sum += arr[i];
     }
-    return ((float)sum/size);
+    return sum;
 }
 
 int getValue_poten(Poten_handel poten){
-    int result = arr_sum(poten->arr_raw, ARR_RAW_MAX);
-    int prev_result = poten->arr_raw[poten->idx];
-    //!hysteria filter, not done
-    // if(
-    return (int)result;
+    int sum = arr_sum(poten->arr_raw, ARR_RAW_MAX);
+    return (float)sum/ARR_RAW_MAX;
 }
 
 //!Not done
 // void setOnThreshold ( int threshold, bool risingEdge){//, void (*onThreshold)(int pin/adc, value) );
 
 // }
+
+
+
+
+
+
+// //!hysteria filter, not done
+// if (poten->arr_raw[poten->idx-1] != poten->arr_raw[poten->idx] && poten->arr_raw[poten->idx] - poten->arr_raw[poten->idx-1] == 1){
+//     int prev_raw = poten->arr_raw[poten->idx-1];
+//     int treshold = prev_raw * ARR_RAW_MAX - 6;
+//     if (treshold > sum){
+
+// }
+// else if (poten->arr_raw[poten->idx+1] != poten->arr_raw[poten->idx] && poten->arr_raw[poten->idx+1] - poten->arr_raw[poten->idx] == 1){
+
+// }
+// // if (

@@ -16,7 +16,7 @@
     med hur Potensiometer del går det kan är bara att ha något mer liknande gpio_config_t men bara minska valet så det är mer "streamlined"
     DVS. göra min egna button_config_t som har mindre alternativ och är gjort bara för knappar
 */
-button_handel init_button(gpio_int_type_t new_intr, gpio_pullup_t new_pull_up, gpio_pulldown_t new_pull_down, gpio_num_t new_pin){
+button_handel init_button(gpio_int_type_t new_intr, gpio_pullup_t new_pull_up, gpio_pulldown_t new_pull_down, gpio_num_t new_input_pin){
     gpio_config_t button_config;
     button_handel btn = (button_handel)malloc(sizeof(button_t));
     if (GPIO_INTR_DISABLE <= new_intr && new_intr <= GPIO_INTR_MAX)
@@ -33,67 +33,33 @@ button_handel init_button(gpio_int_type_t new_intr, gpio_pullup_t new_pull_up, g
     { button_config.pull_down_en = new_pull_down; }
     else { return NULL; }
 
-    button_config.pin_bit_mask = 1ULL << new_pin;
+    button_config.pin_bit_mask = 1ULL << new_input_pin;
     ESP_ERROR_CHECK(gpio_config(&button_config));
 
     // Initialize button_t struct
-    btn->btn_pin = new_pin;
+    btn->btn_pin = new_input_pin;
     btn->level = 0;
     btn->latch = 0;
     return btn;
 }
-/*
-!   for(int i = 0; i < sizeof(int); i++)
-!    {
-!        printf("bit: %u\n", !!(btn->state_bit_mask & (1 << i)));
-!    }
-!    printf("\n");
-!
-!    btn->state_bit_mask = ALL_ON;
-!    for(int i = 0; i < sizeof(int); i++)
-!    {
-!        printf("bit: %u\n", !!(btn->state_bit_mask & (1 << i)));
-!    }
-!    printf("\n");
-!
-!    btn->state_bit_mask = LEVEL_ON;
-!    for(int i = 0; i < sizeof(int); i++)
-!    {
-!        printf("bit: %u\n", !!(btn->state_bit_mask & (1 << i)));
-!    }
-!    printf("\n");
-!
-!    btn->state_bit_mask = LATCH_ON;
-!    for(int i = 0; i < sizeof(int); i++)
-!    {
-!        printf("bit: %u\n", !!(btn->state_bit_mask & (1 << i)));
-!    }
-!    printf("\n");
-*/
 
-/*
-    elapsed_time skulle kunna vara en del av button_t
-    vilket skulle göra koden lite mer eligant (gömma mer av koden)
-*/
-bool update_button(button_handel btn, TickType_t curr_time){
+void update_button(button_handel btn, TickType_t curr_time){
     int new_level = gpio_get_level(btn->btn_pin);
-    if (new_level !=  btn->level){
+    if (new_level ==  btn->level){ return; }
+    else{
         btn->last_updated = xTaskGetTickCount();
         btn->level = new_level;
     }
+
     if (btn->level == ON && btn->latch == OFF){        // Button goes from off to on
         if (curr_time - btn->last_updated >= TIME_TO_WAIT_FOR_DEBOUNCE){ 
             btn->latch = ON;
-            return true;
         }
-    }
-    else if (btn->level == OFF && btn->latch == ON){   // Button goes from on to off
+    } else if (btn->level == OFF && btn->latch == ON){   // Button goes from on to off
         if (btn->last_updated >= TIME_TO_WAIT_FOR_DEBOUNCE){
             btn->latch = ON;
-            return true;
         }
     }
-    return false;
 }
 
 bool isPressed_button(button_handel btn){
