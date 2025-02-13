@@ -28,37 +28,74 @@ button_handel init_button(button_config_t *button_config){
     button_handel btn = (button_handel)malloc(sizeof(button_t));
     btn->btn_pin = button_config->input_pin;
     btn->level = 0;
-    btn->latch = 0;
     btn->cb = NULL;
+    btn->state = OFF_STATE;
     return btn;
 }
 
-void update_button(button_handel btn, TickType_t curr_time){
+void update_button(button_handel btn, TickType_t curr_time, int data){
     int new_level = gpio_get_level(btn->btn_pin);
-    if (new_level != btn->level){
+    // printf("%d\n", btn->state);
+    switch(btn->state){
+        case ON_STATE:
+            if(new_level != btn->level){
+                btn->state = ON_TO_OFF_STATE;
+                btn->last_updated = xTaskGetTickCount();
+            }
+            if(btn->on_press){
+                btn->on_press = false;
+                btn->cb(data);
+            }
+            break;
+        case OFF_STATE:
+            if(new_level != btn->level){
+                btn->state = OFF_TO_ON_STATE;
+                btn->on_press = true;
+                btn->last_updated = xTaskGetTickCount();
+            }
+            break;
+        case ON_TO_OFF_STATE:
+            if (curr_time - btn->last_updated >= TIME_TO_WAIT_FOR_DEBOUNCE){ 
+                btn->state = OFF_STATE;
+            }
+            break;
+        case OFF_TO_ON_STATE:
+            if (curr_time - btn->last_updated >= TIME_TO_WAIT_FOR_DEBOUNCE){ 
+                btn->state = ON_STATE;
+            }
+            break;
+        default:
+            break;
+    }
+    btn->level = new_level;
+}
+/*  
+    int new_level = gpio_get_level(btn->btn_pin);
+    if (new_level != btn->level && btn->press_start){
+        btn->press_start = false;
         btn->last_updated = xTaskGetTickCount();
         btn->level = new_level;
     }
     // printf("Curr_time: %d & updated: %d & elapsed: %d\n", (int)curr_time, (int)btn->last_updated, (int)(curr_time - btn->last_updated));
     if (btn->level == ON && btn->latch == OFF){        // Button goes from off to on
+        if(btn->on_press){
+            btn->on_press = false;
+            btn->cb(data);
+        }
         if (curr_time - btn->last_updated >= TIME_TO_WAIT_FOR_DEBOUNCE){ 
             btn->latch = ON;
-            btn->last_updated = xTaskGetTickCount();
         }
     } else if (btn->level == OFF && btn->latch == ON){   // Button goes from on to off
         if (curr_time - btn->last_updated >= TIME_TO_WAIT_FOR_DEBOUNCE){
             btn->latch = OFF;
-            btn->last_updated = xTaskGetTickCount();
+            btn->on_press = true;
+            btn->press_start = true;
         }
     }
-}
+*/
 
-bool isPressed_button(button_handel btn, int data){
-    bool state = (btn->latch == ON && btn->level == ON) ? true : false;
-    if(btn->cb != NULL && state){
-        btn->cb(data);
-    }
-    return state;
+bool isPressed_button(button_handel btn){
+    return (btn->state == ON_STATE) ? true : false;
 }
 
 void setOnPressed_button(button_handel btn, void (*onPressed)(int)){

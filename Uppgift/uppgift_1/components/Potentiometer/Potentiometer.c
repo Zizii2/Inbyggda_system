@@ -58,7 +58,6 @@ int getValue_poten(Poten_handel poten, int data){
     return get_avg(sum, ARR_RAW_MAX);
 }
 
-//!Not done
 void setOnThreshold_poten(Poten_handel poten, int threshold, bool on_rising_edge, void (*onThreshold)(adc1_channel_t channel, int value)){
     poten->threshold = threshold;
     poten->on_rising_edge = on_rising_edge;

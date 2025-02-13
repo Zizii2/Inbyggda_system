@@ -1,5 +1,6 @@
 #pragma once
 #include "math.h"
+#include "esp_err.h"
 #include "driver/gpio.h"
 #include "driver/ledc.h"
 #include "freertos/FreeRTOS.h"
@@ -12,12 +13,22 @@
 #define LEDC_DUTY_MAX           (8192.0)
 #define LEDC_FREQUENCY          (4000) // Frequency in Hertz. Set frequency at 4 kHz
 
-static enum Analog_led_state_t{ CON_STATE=0, SIN_STATE=1 };
+#define STEP_OF_PERIOD          (0.01)
+#define ANGEL_INCREASE          (0.05)
+
+static enum Analog_led_state_t{ CONST_STATE=0, SIN_STATE=1 };
+
+typedef struct Analog_led_config{
+    gpio_num_t output_pin;
+    ledc_channel_t channel;
+    int duty;
+} Analog_led_config;
 
 typedef struct Analog_led_t{
     gpio_num_t pin;
     enum Analog_led_state_t state;
-    double period_step;
+    TickType_t last_updated;
+    double period;
     double duty;
     double angel;
 } Analog_led_t;
@@ -25,7 +36,7 @@ typedef struct Analog_led_t{
 typedef Analog_led_t *Analog_led_handel;
 
 //lägg till mer parametrar senare för init
-Analog_led_handel init_analog(gpio_num_t new_output_pin);
-void update_analog(Analog_led_handel led);
+Analog_led_handel init_analog(Analog_led_config* led_config);
+void update_analog(Analog_led_handel led, TickType_t curr_time);
 void set_led_analog(Analog_led_handel led, int new_value );
 void sin_analog(Analog_led_handel led, int new_period);

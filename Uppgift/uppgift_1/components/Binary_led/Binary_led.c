@@ -50,6 +50,6 @@ void set_led_binary (Bin_led_handel led, enum Binary_led_value_t new_value){
 
 void blink_binary(Bin_led_handel led, unsigned int MS_on, unsigned int MS_off){
     if (led->state != BLINK_STATE){ led->state = BLINK_STATE; }
-    led->blink_off_timer = pdMS_TO_TICKS(MS_on);
-    led->blink_on_timer = pdMS_TO_TICKS(MS_off);
+    led->blink_on_timer = pdMS_TO_TICKS(MS_on);
+    led->blink_off_timer = pdMS_TO_TICKS(MS_off);
 }
