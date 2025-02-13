@@ -3,14 +3,14 @@
 
 Analog_led_handel init_analog(gpio_num_t new_output_pin){
     Analog_led_handel led = (Analog_led_handel)malloc(sizeof(Analog_led_t));
-    gpio_config_t led_config = {
-        .intr_type = GPIO_INTR_DISABLE,
-        .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = 1ULL << new_output_pin,
-        .pull_down_en = GPIO_PULLDOWN_ENABLE,
-        .pull_up_en = GPIO_PULLUP_DISABLE
-    };
-    gpio_config(&led_config);
+    // gpio_config_t led_config = {
+    //     .intr_type = GPIO_INTR_DISABLE,
+    //     .mode = GPIO_MODE_OUTPUT,
+    //     .pin_bit_mask = 1ULL << new_output_pin,
+    //     .pull_down_en = GPIO_PULLDOWN_ENABLE,
+    //     .pull_up_en = GPIO_PULLUP_DISABLE
+    // };
+    // gpio_config(&led_config);
 
     led->pin = new_output_pin;
     led->state = CON_STATE;

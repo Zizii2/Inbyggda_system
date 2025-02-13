@@ -1,37 +1,34 @@
 #include <stdio.h>
 #include "Potentiometer.h"
 
+#define get_avg(sum, count) ((float)sum/count)
+
 static bool arr_raw_init = true;
 
-/// @brief 
-/// @param new_channel Set to NULL only if `new_pin` is set
-/// @param new_pin Set to NULL only if `new_channel` is set
-/// @param new_atten set decibel filter on input
-/// @param new_width set widht of channel bit
-/// @return 
-Poten_handel init_poten (adc1_channel_t *new_channel, gpio_num_t *new_pin, adc_atten_t new_atten, adc_bits_width_t new_width){ //pin/adc, xxx );
-    Poten_handel poten = (Poten_handel)malloc(sizeof(Potentiometer_t));    
-    if (new_channel == NULL && new_pin == NULL){
-        free(poten);
+static int arr_sum(int* arr, int size);
+
+Poten_handel init_poten (Potentiometer_config_t *poten_config){
+    if((poten_config->use_channel && poten_config->use_pin) || (!poten_config->use_channel && !poten_config->use_pin)){
         return NULL;
     }
-    if (new_channel != NULL){
-        adc1_config_channel_atten(*new_channel, new_atten);
-        adc1_config_width(new_width);
-        poten->channel = *new_channel;
-        poten->atten = new_atten;
-        poten->width = new_width;
-        poten->pin = *new_channel;
+    Poten_handel poten = (Poten_handel)malloc(sizeof(Potentiometer_t)); 
+    if (poten_config->use_channel){
+        adc1_config_channel_atten(poten_config->channel, poten_config->atten);
+        poten->channel = poten_config->channel;
+        poten->pin = poten_config->channel;
     }
-    if (new_pin != NULL){
-        adc1_config_channel_atten(*new_pin, new_atten);
-        adc1_config_width(new_width);
-        poten->channel = *new_pin;
-        poten->atten = new_atten;
-        poten->width = new_width;
-        poten->pin = *new_pin;
+    else{
+        adc1_config_channel_atten(poten_config->pin, poten_config->atten);
+        poten->channel = poten_config->pin;
+        poten->pin = poten_config->pin;
     }
-    poten->idx = 0;
+    adc1_config_width(poten_config->width);
+    poten->atten = poten_config->atten;
+    poten->width = poten_config->width;
+    poten->idx = ARR_RAW_START;
+    poten->prev_sum = 0;
+    poten->threshold = 0;
+    poten->on_rising_edge = false;
     return poten;
 }
 
@@ -46,26 +43,35 @@ void update_poten(Poten_handel poten){
     }
     poten->arr_raw[poten->idx] = value;
     poten->idx++;
-    if (poten->idx == ARR_RAW_MAX){ poten->idx = 0; }
+    if (poten->idx == ARR_RAW_MAX){ poten->idx = ARR_RAW_START; }
+}
+
+int getValue_poten(Poten_handel poten, int data){
+    int sum = arr_sum(poten->arr_raw, ARR_RAW_MAX);
+    if (get_avg(sum, ARR_RAW_MAX) > get_avg(poten->prev_sum, ARR_RAW_MAX) && poten->on_rising_edge){
+        poten->cb(poten->channel, data);
+    }
+    else if (sum >= poten->threshold){
+        poten->cb(poten->channel, data);
+    }
+    poten->prev_sum = sum;
+    return get_avg(sum, ARR_RAW_MAX);
+}
+
+//!Not done
+void setOnThreshold_poten(Poten_handel poten, int threshold, bool on_rising_edge, void (*onThreshold)(adc1_channel_t channel, int value)){
+    poten->threshold = threshold;
+    poten->on_rising_edge = on_rising_edge;
+    poten->cb = onThreshold;
 }
 
 static int arr_sum(int* arr, int size){
-    int sum = arr[0];
-    for (int i=1; i < size; i++){
+    int sum = arr[ARR_RAW_START];
+    for (int i=ARR_RAW_START+1; i < size; i++){
         sum += arr[i];
     }
     return sum;
 }
-
-int getValue_poten(Poten_handel poten){
-    int sum = arr_sum(poten->arr_raw, ARR_RAW_MAX);
-    return (float)sum/ARR_RAW_MAX;
-}
-
-//!Not done
-// void setOnThreshold ( int threshold, bool risingEdge){//, void (*onThreshold)(int pin/adc, value) );
-
-// }
 
 
 

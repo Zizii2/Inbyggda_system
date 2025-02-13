@@ -7,8 +7,8 @@ Bin_led_handel init_binary(gpio_num_t new_output_pin, enum Binary_led_value_t ne
         .intr_type = GPIO_INTR_DISABLE,
         .mode = GPIO_MODE_OUTPUT,
         .pin_bit_mask = 1ULL << new_output_pin,
-        .pull_down_en = GPIO_PULLDOWN_ENABLE,
-        .pull_up_en = GPIO_PULLUP_DISABLE
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .pull_up_en = GPIO_PULLUP_ENABLE
     };
     gpio_config(&led_config);
     led->pin = new_output_pin;
