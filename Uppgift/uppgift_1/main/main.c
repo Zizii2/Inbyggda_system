@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "Button.h"
 #include "Potentiometer.h"
+#include "Binary_led.h"
+#include "Analog_led.h"
 
 void app_main(void){
     button_handel btn1 = init_button(GPIO_INTR_DISABLE, GPIO_PULLUP_DISABLE, GPIO_PULLDOWN_DISABLE, GPIO_NUM_5);
@@ -12,7 +14,7 @@ void app_main(void){
         //     vTaskDelay(pdMS_TO_TICKS(30));
         // }
     while(1){
-        update_button(btn1, xTaskGetTickCount()); //! Needs to be check
+        update_button(btn1, xTaskGetTickCount()); //! Needs to be checked
         if (isPressed_button(btn1)){ printf("Button pressed\n"); }
         vTaskDelay(pdMS_TO_TICKS(30));
     }

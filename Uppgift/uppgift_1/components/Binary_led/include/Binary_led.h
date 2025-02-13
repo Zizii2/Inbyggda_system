@@ -17,8 +17,8 @@ typedef struct Binary_led_t{
 
 typedef Binary_led_t *Bin_led_handel;
 
-Bin_led_handel init (gpio_num_t new_output_pin, enum Binary_led_value_t new_value);
-void update (Bin_led_handel led, TickType_t curr_time);
-void setLed (Bin_led_handel led, enum Binary_led_value_t new_value); 
-void blink(Bin_led_handel led, unsigned int miliseocnds_on, unsigned int milliseconds_off);
+Bin_led_handel init_binary(gpio_num_t new_output_pin, enum Binary_led_value_t new_value);
+void update_binary(Bin_led_handel led, TickType_t curr_time);
+void set_led_binary(Bin_led_handel led, enum Binary_led_value_t new_value); 
+void blink_binary(Bin_led_handel led, unsigned int miliseocnds_on, unsigned int milliseconds_off);
 
