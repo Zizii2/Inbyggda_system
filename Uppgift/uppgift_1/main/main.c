@@ -4,25 +4,34 @@
 #include "Binary_led.h"
 #include "Analog_led.h"
 
-void print_num(int num){
-    printf("%d, nice!\n---\n", num);
+void print_num(void *data){
+    int *num = (int *)data;
+    printf("%d, nice!\n---\n", *num);
+}
+
+void print_num2(adc1_channel_t channel, void *data){
+    int *num = (int *)data;
+    printf("%d, nice!\n---\n", *num);
 }
 
 void app_main(void){
-    button_config_t btn_config = {
-        .intr = GPIO_INTR_DISABLE,
-        .pull_up = GPIO_PULLUP_DISABLE,
-        .pull_down = GPIO_PULLDOWN_DISABLE,
-        .input_pin = GPIO_NUM_2
+    Potentiometer_config_t poten_config = {
+        .atten = ADC_ATTEN_DB_12,
+        .channel = ADC1_CHANNEL_2,
+        .pin = -1,
+        .use_channel = true,
+        .use_pin = false,
+        .width = ADC_WIDTH_BIT_12
     };
-    button_handel btn1 = init_button(&btn_config);
-    setOnPressed_button(btn1, print_num);
+    Poten_handel poten = init_poten(&poten_config);
+    setOnThreshold_poten(poten, 2500, false, print_num2, (void *)10);
     while(1){
-        update_button(btn1, xTaskGetTickCount(), 69);
-        // isPressed_button(btn1, 69);
+        update_poten(poten);
+        printf("%d\n", getValue_poten(poten));
         vTaskDelay(pdMS_TO_TICKS(30));
     }
-    free(btn1);
+    free(poten);
+ 
 }
 // adc1_channel_t channel = ADC1_CHANNEL_5;
 // Poten_handel poten = init_poten(&channel, NULL, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12);

@@ -48,9 +48,9 @@ Analog_led_handel init_analog(Analog_led_config* led_config){
 void update_analog(Analog_led_handel led, TickType_t curr_time){
     if(led->state == SIN_STATE){
         if(curr_time - led->last_updated >= (led->period * STEP_OF_PERIOD)){
-            led->angel += ANGEL_INCREASE;
+            led->angel += (led->period * ANGEL_INCREASE); //! NEW THING HERE (MIGHT NOT WORK)
             if(led->angel > 360){ led->angel = 0; }
-            led->duty = calc_duty(led->angel);
+            led->duty = calc_duty(led->angel); 
         }
     }
     ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, led->duty);
