@@ -4,7 +4,6 @@
 #define get_avg(sum, count) ((float)sum/count)
 
 static bool arr_raw_init = true;
-static int count_for_rising_edge = 2;
 
 static int arr_sum(int* arr, int size);
 static void callback_managment(Poten_handel poten);
@@ -29,7 +28,7 @@ Poten_handel init_poten (Potentiometer_config_t *poten_config){
     poten->prev_sum = 0;
     poten->threshold = 0;
     poten->on_rising_edge = false;
-    poten->do_callback = false;
+    poten->do_callback = NOT_INIT_POTEN;
     return poten;
 }
 
@@ -43,12 +42,14 @@ void update_poten(Poten_handel poten){
         return;
     }
     poten->arr_raw[poten->idx] = value;
-    callback_managment(poten);
+    if (poten->do_callback){
+        callback_managment(poten);
+    }
     poten->idx++;
     if (poten->idx == ARR_RAW_MAX){ poten->idx = ARR_RAW_START; }
 }
 
-float getValue_poten(Poten_handel poten){
+int getValue_poten(Poten_handel poten){
     int sum = arr_sum(poten->arr_raw, ARR_RAW_MAX);
     poten->prev_sum = sum;
     return get_avg(sum, ARR_RAW_MAX);
@@ -57,8 +58,10 @@ float getValue_poten(Poten_handel poten){
 void setOnThreshold_poten(Poten_handel poten, int threshold, bool on_rising_edge, void (*onThreshold)(adc1_channel_t channel, void *value), void *data){
     poten->threshold = threshold;
     poten->on_rising_edge = on_rising_edge;
+    if (onThreshold <= 0){ onThreshold = 4000; } //? how do I make this more modulare?
     poten->cb = onThreshold;
     poten->data = data;
+    poten->do_callback = ENABLED_POTEN;
 }
 
 static int arr_sum(int* arr, int size){
@@ -70,7 +73,7 @@ static int arr_sum(int* arr, int size){
 }
 
 static void callback_managment(Poten_handel poten){
-    // Callback
+    int count_for_rising_edge = 2;
     int prev_idx = poten->idx - 1;
     int has_rising_edge = count_for_rising_edge;
     for(int i=ARR_RAW_START; i<count_for_rising_edge; i++){
@@ -81,11 +84,19 @@ static void callback_managment(Poten_handel poten){
             prev_idx--;
         }
     }
-    if (has_rising_edge){ //if not == 0 then it is enough of a rising edge
+    if (has_rising_edge && poten->do_callback == ENABLED_POTEN && poten->on_rising_edge){ //if not == 0 then it is enough of a rising edge
         poten->cb(poten->channel, poten->data);
+        poten->do_callback = DISABLED_POTEN;
     }
-    else if (poten->arr_raw[poten->idx] >= poten->threshold){
+    else if (!has_rising_edge && poten->on_rising_edge){
+        poten->do_callback = ENABLED_POTEN;
+    }
+    if (poten->arr_raw[poten->idx] >= poten->threshold && poten->do_callback == ENABLED_POTEN){
         poten->cb(poten->channel, poten->data);
+        poten->do_callback = DISABLED_POTEN;
+    }
+    else if (poten->arr_raw[poten->idx] < poten->threshold) {
+        poten->do_callback = ENABLED_POTEN;
     }
 }
 

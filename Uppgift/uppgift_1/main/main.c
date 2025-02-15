@@ -27,7 +27,7 @@ void app_main(void){
     setOnThreshold_poten(poten, 2500, false, print_num2, (void *)10);
     while(1){
         update_poten(poten);
-        printf("%d\n", getValue_poten(poten));
+        printf("%.2f\n", getValue_poten(poten));
         vTaskDelay(pdMS_TO_TICKS(30));
     }
     free(poten);

@@ -8,6 +8,12 @@
 
 typedef void(*callback_poten)(adc1_channel_t, void *);
 
+static enum Cb_state_poten{
+    NOT_INIT_POTEN,
+    DISABLED_POTEN,
+    ENABLED_POTEN
+};
+
 typedef struct Potentiometer_config_t{
     adc1_channel_t channel;
     gpio_num_t pin;
@@ -25,7 +31,7 @@ typedef struct Potentiometer_t{
     int prev_sum;
     int threshold;
     bool on_rising_edge;
-    bool do_callback;
+    enum Cb_state_poten do_callback;
     callback_poten cb;
     void *data;
 }Potentiometer_t;
@@ -34,6 +40,6 @@ typedef Potentiometer_t *Poten_handel;
 
 Poten_handel init_poten(Potentiometer_config_t *poten_config);
 void update_poten(Poten_handel poten);
-float getValue_poten(Poten_handel poten);
+int getValue_poten(Poten_handel poten);
 void setOnThreshold_poten(Poten_handel poten, int threshold, bool on_rising_dge, void (*onThreshold)(adc1_channel_t channel, void *value), void *data);
 
