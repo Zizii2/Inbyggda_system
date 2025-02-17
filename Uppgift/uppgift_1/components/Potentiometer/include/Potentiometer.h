@@ -30,7 +30,7 @@ typedef struct Potentiometer_t{
     adc1_channel_t channel;
     int arr_raw[ARR_RAW_MAX];
     int idx;
-    int prev_sum;
+    int prev_value;
     int threshold;
     bool on_rising_edge;
     enum Cb_state_poten do_callback;

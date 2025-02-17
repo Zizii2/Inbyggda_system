@@ -17,9 +17,9 @@ void app_main(void){
     Potentiometer_config_t poten_config = {
         .atten = ADC_ATTEN_DB_12,
         .channel = ADC1_CHANNEL_2,
-        .pin = -1,
-        .use_channel = true,
-        .use_pin = false,
+        .pin = 2,
+        .use_channel = false,
+        .use_pin = true,
         .width = ADC_WIDTH_BIT_12
     };
     Poten_handel poten = init_poten(&poten_config);
