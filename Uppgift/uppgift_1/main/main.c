@@ -9,9 +9,8 @@ void print_num(void *data){
     printf("%d, nice!\n---\n", *num);
 }
 
-void print_num2(adc1_channel_t channel, void *data){
-    int *num = (int *)data;
-    printf("%d, nice!\n---\n", *num);
+void print_num2(adc1_channel_t channel, int data){
+    printf("%d, nice!\n---\n", data);
 }
 
 void app_main(void){
@@ -24,14 +23,13 @@ void app_main(void){
         .width = ADC_WIDTH_BIT_12
     };
     Poten_handel poten = init_poten(&poten_config);
-    setOnThreshold_poten(poten, 2500, false, print_num2, (void *)10);
+    setOnThreshold_poten(poten, -1, true, print_num2, 10);
     while(1){
         update_poten(poten);
-        printf("%.2f\n", getValue_poten(poten));
+        // printf("%d\n", getValue_poten(poten));
         vTaskDelay(pdMS_TO_TICKS(30));
     }
     free(poten);
- 
 }
 // adc1_channel_t channel = ADC1_CHANNEL_5;
 // Poten_handel poten = init_poten(&channel, NULL, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12);
