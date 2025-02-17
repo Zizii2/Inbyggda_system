@@ -6,12 +6,26 @@
 #include <iostream>
 #include "esp_log.h"
 
-#define PRINT_COLOR()
+#define ANSI_RED "\033[0;31m"
+#define ANSI_GREEN "\033[0;32m"
+#define ANSI_YELLOW "\033[0;33m"
+#define ANSI_BLUE "\033[0;34m"
+#define ANSI_MAGENTA "\033[0;35m"
+#define ANSI_CYAN "\033[0;36m"
+#define ANSI_RESET "\033[0m"
+#define NEW_LINE "\n"
+
+#define PRINT_COLOR(color, format_str, ...) \
+    printf("%s" format_str "%s", color, ##__VA_ARGS__, ANSI_RESET)
+
+#define PRINT_W_TAG(tag_color, tag_name, format_str, ...) \
+    PRINT_COLOR(tag_color, "[%s] ", tag_name); \
+    PRINT_COLOR(ANSI_RESET, format_str, ##__VA_ARGS__)
 
 void print::printNumbers(int start, int stop)
 {
     for(int i=start; i<=stop; i++){
-        printf("%d\n", i);
+        PRINT_W_TAG(ANSI_BLUE, "Nr.", "%d\n", i);
     }
 }
 void print::takeTimeAndPrintEverySec(int time_limit){

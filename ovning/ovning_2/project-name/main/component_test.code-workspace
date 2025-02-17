@@ -4,7 +4,7 @@
 			"path": ".."
 		},
 		{
-			"path": "../../../component"
+			"path": "../../../../component"
 		},
 		// {
 		// 	"path": "../component"

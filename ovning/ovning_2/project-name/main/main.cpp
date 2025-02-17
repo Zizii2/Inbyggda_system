@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "helper_component.h"
+// #include "helper_comp.h"
 #include "printer.h"
 
 using namespace print;
