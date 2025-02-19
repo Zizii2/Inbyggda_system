@@ -41,15 +41,18 @@ Analog_led_handel init_analog(Analog_led_config* led_config){
     led->period = 0;
     led->last_updated = xTaskGetTickCount();
     led->angel = 0.0;
-    led->duty = 0.0;
+    led->duty = led->duty;
     return led;
 }
 
 void update_analog(Analog_led_handel led, TickType_t curr_time){
     if(led->state == SIN_STATE){
         if(curr_time - led->last_updated >= (led->period * STEP_OF_PERIOD)){
-            led->angel += (led->period * ANGEL_INCREASE); //! NEW THING HERE (MIGHT NOT WORK)
-            if(led->angel > 360){ led->angel = 0; }
+            led->angel += ANGEL_INCREASE;
+            if(led->angel > 360){
+                led->angel = 0;
+                led->last_updated = xTaskGetTickCount();
+            }
             led->duty = calc_duty(led->angel); 
         }
     }
@@ -63,7 +66,7 @@ void set_led_analog(Analog_led_handel led, int value ){
     else{ ESP_ERROR_CHECK(ESP_ERR_INVALID_ARG); }
 }
 
-void sin_analog(Analog_led_handel led, int new_period){
+void sin_analog(Analog_led_handel led, double new_period){
     led->state = SIN_STATE;
     led->last_updated = xTaskGetTickCount();
     led->period = new_period;

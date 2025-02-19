@@ -39,4 +39,4 @@ typedef Analog_led_t *Analog_led_handel;
 Analog_led_handel init_analog(Analog_led_config* led_config);
 void update_analog(Analog_led_handel led, TickType_t curr_time);
 void set_led_analog(Analog_led_handel led, int new_value );
-void sin_analog(Analog_led_handel led, int new_period);
+void sin_analog(Analog_led_handel led, double new_period);

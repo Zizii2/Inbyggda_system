@@ -14,22 +14,17 @@ void print_num2(adc1_channel_t channel, int data){
 }
 
 void app_main(void){
-    Potentiometer_config_t poten_config = {
-        .atten = ADC_ATTEN_DB_12,
-        .channel = ADC1_CHANNEL_2,
-        .pin = 2,
-        .use_channel = false,
-        .use_pin = true,
-        .width = ADC_WIDTH_BIT_12
+    Analog_led_config led_config = {
+        .channel = LEDC_CHANNEL_0,
+        .duty = 8000,
+        .output_pin = GPIO_NUM_5
     };
-    Poten_handel poten = init_poten(&poten_config);
-    setOnThreshold_poten(poten, -1, true, print_num2, 10);
+    Analog_led_handel led = init_analog(&led_config);
+    sin_analog(led, 2000.0);
     while(1){
-        update_poten(poten);
-        // printf("%d\n", getValue_poten(poten));
-        vTaskDelay(pdMS_TO_TICKS(30));
+        update_analog(led, xTaskGetTickCount());
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
-    free(poten);
 }
 // adc1_channel_t channel = ADC1_CHANNEL_5;
 // Poten_handel poten = init_poten(&channel, NULL, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12);
