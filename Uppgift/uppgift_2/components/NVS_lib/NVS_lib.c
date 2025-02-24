@@ -55,6 +55,11 @@
     #define NVS_NAMESPACE "Device_config"
 #endif
 
+/*
+    TODO free device name (tmp) and serial_name (tmp)
+    TODO fix so in Set... the new name is malloc'd and if new name is greater realloc()
+*/
+
 config_handel init_NVS(void){
     config_handel config = (config_handel)malloc(sizeof(configurations_t));
     esp_err_t err = nvs_flash_init();
@@ -148,7 +153,7 @@ bool setDeviceName (char *new_device_name, config_handel config){
         ESP_LOGE(TAG_NVS, "Failed to commit to nvs");
     }
     nvs_close(config->nvs_handle);
-
+    strcpy(config->curr_device_name, new_device_name);
     if(status_err != ESP_OK){ return false; }
     return true;
 }
@@ -166,7 +171,7 @@ bool setSerialNumber (char *new_serial_number, config_handel config){
         ESP_LOGE(TAG_NVS, "Failed to commit to nvs");
     }
     nvs_close(config->nvs_handle);
-
+    strcpy(config->curr_serial_number, new_serial_number);
     if(status_err != ESP_OK){ return false; }
     return true;
 }

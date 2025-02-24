@@ -17,10 +17,11 @@ void app_main(void){
     Analog_led_config led_config = {
         .channel = LEDC_CHANNEL_0,
         .duty = 8000,
-        .output_pin = GPIO_NUM_5
+        .output_pin = GPIO_NUM_0
     };
     Analog_led_handel led = init_analog(&led_config);
-    sin_analog(led, 2000.0);
+    // set_led_analog(led, 4000);
+    sin_analog(led, 10000.0);
     while(1){
         update_analog(led, xTaskGetTickCount());
         vTaskDelay(pdMS_TO_TICKS(10));
