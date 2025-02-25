@@ -4,8 +4,10 @@
 #include "string.h"
 
 typedef struct configurations_t{
-    char *curr_device_name;
-    char *curr_serial_number;
+    int device_name_len;
+    int serial_number_len;
+    char device_name[50];
+    char serial_number[9];
     nvs_handle_t nvs_handle;
 } configurations_t;
 
@@ -26,4 +28,4 @@ bool setDeviceName (char * new_device_name, config_handel config);
 bool setSerialNumber (char * new_serial_number, config_handel config);
 // Kopiera in nytt serial number till arbetsminne och spara på nvs
 
-
+void free_memory(config_handel config);

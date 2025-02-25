@@ -17,15 +17,12 @@ void app_main(void)
     printf("Serial number: %s\n", getSerialNumber(config));
     hej(config);
     printf("device name: %s\n", getDeviceName(config));
-    if (setDeviceName("Anton's device lllllllaaaalslal", config)){
+    if (setDeviceName("Anton's device", config)){
         printf("device ok\n");
         printf("device name: %s\n", getDeviceName(config));
     }
-    if (setSerialNumber("0x00123ABC", config)){
+    if (setSerialNumber("0x001", config)){
         printf("serial ok\n");
         printf("Serial number: %s\n", getSerialNumber(config));
     }
-
-//     printf("device name: %s\n", getDeviceName(config));
-//     printf("Serial number: %s\n", getSerialNumber(config));
 }
