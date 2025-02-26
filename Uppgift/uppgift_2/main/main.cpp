@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "NVS_lib.h"
+#include "Led_controller.h"
 
 void hej(config_handel config){
     char name[] = "test";
@@ -10,9 +11,18 @@ void hej(config_handel config){
 
 }
 
-void app_main(void)
+extern "C" void app_main(void)
 {
-    config_handel config = init_NVS();
+    analogLed led1(GPIO_NUM_5);
+    led1.waveLed(10);
+    while(1){
+        led1.update();
+        vTaskDelay(pdMS_TO_TICKS(30));
+    }
+}
+
+/*
+config_handel config = init_NVS();
     printf("device name: %s\n", getDeviceName(config));
     printf("Serial number: %s\n", getSerialNumber(config));
     hej(config);
@@ -25,4 +35,4 @@ void app_main(void)
         printf("serial ok\n");
         printf("Serial number: %s\n", getSerialNumber(config));
     }
-}
+*/
