@@ -22,10 +22,10 @@ char *getDeviceName (config_handel config);
 char *getSerialNumber (config_handel config);
 // Returnera serial number parameter från arbetsminne
 
-bool setDeviceName (char * new_device_name, config_handel config);
+bool setDeviceName (char *new_device_name, config_handel config);
 // Kopiera in nytt device name till arbetsminne och spara på nvs
 
-bool setSerialNumber (char * new_serial_number, config_handel config);
+bool setSerialNumber (char *new_serial_number, config_handel config);
 // Kopiera in nytt serial number till arbetsminne och spara på nvs
 
 void free_memory(config_handel config);

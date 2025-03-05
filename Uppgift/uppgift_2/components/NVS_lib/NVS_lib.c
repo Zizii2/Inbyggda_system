@@ -67,7 +67,7 @@
 
 /*
     //TODO free device name (tmp) and serial_name (tmp)
-    TODO fix so in Set... the new name is malloc'd and if new name is greater realloc()
+    //TODO fix so in Set... the new name is malloc'd and if new name is greater realloc()
 */
 
 static int find_arr_len(char *arr){
