@@ -15,13 +15,14 @@ void hej(config_handel config){
 }
 
 void app_main(void){
+    // nvs_flash_erase();
     char device_name[] = "Anton's device\n";
     char serial_num[] = "0x001\n";
     config_handel config = init_NVS();
     //Get inizial values
-    printf("device name: %s\n", getDeviceName(config));
+    printf("device name: %s", getDeviceName(config));
     printf("Serial number: %s\n", getSerialNumber(config));
-    /*
+    printf("-----\n");
     //first change
     hej(config);
 
@@ -35,7 +36,7 @@ void app_main(void){
             printf("serial ok\n");
             printf("Serial number: %s\n", getSerialNumber(config));
         }
-    */
+    
 
     //! Code for bonus
     // analogLed led1(GPIO_NUM_5);

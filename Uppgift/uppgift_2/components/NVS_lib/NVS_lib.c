@@ -3,81 +3,10 @@
 
 #define TAG_NVS "NVS_LOG"
 #define TAG_MALLOC "MALLOC"
-/*
-    device name
-*/
-//device name len
-#ifndef DEFAULT_DEVICE_NAME_LEN
-    #define DEFAULT_DEVICE_NAME_LEN 12
-#endif
-
-// device name max length
-#ifndef DEVICE_NAME_MAX_LEN
-    #define DEVICE_NAME_MAX_LEN 50
-#endif
-
-//default device name key
-#ifndef DEFAULT_DEVICE_NAME
-    #define DEFAULT_DEVICE_NAME "Device_name"
-#endif
-
-//device name key
-#ifndef DEVICE_NAME
-        #define DEVICE_NAME DEFAULT_DEVICE_NAME
-#endif
-
-/*
-    serial
-*/
-//serial len
-#ifndef DEFAULT_SERIAL_LEN
-    #define DEFAULT_SERIAL_NR 7
-#endif
-
-//default serial name
-#ifndef DEFAULT_SERIAL_NAME
-    #define DEFAULT_SERIAL_NAME "Serial"
-#endif
-
-//serial key
-#ifndef SERIAL_NAME
-    #define SERIAL_NAME DEFAULT_SERIAL_NAME
-#endif
-
-//default serial value
-#ifndef DEFAULT_SERIAL_VAL
-    #define DEFAULT_SERIAL_VAL "0000000"
-#endif
-
-#ifndef SERIAL_VAL_MAX_LEN
-    #define SERIAL_VAL_MAX_LEN 8
-#endif
-
-//serial value
-#ifndef SERIAL_VAL
-    #define SERIAL_VAL DEFAULT_SERIAL_VAL
-#endif
-
-/*
-    namespace
-*/
-#ifndef NVS_NAMESPACE
-    #define NVS_NAMESPACE "Device_config"
-#endif
-
-/*
-    //TODO free device name (tmp) and serial_name (tmp)
-    //TODO fix so in Set... the new name is malloc'd and if new name is greater realloc()
-*/
-
-static int find_arr_len(char *arr){
-    int len = 0;
-    for(; arr[len]!='\n'; len++){}
-    return ++len;
-}
 
 config_handel init_NVS(void){
     config_handel config = (config_handel)malloc(sizeof(configurations_t));
+    memset(config, 0, sizeof(configurations_t));
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {
@@ -122,10 +51,12 @@ config_handel init_NVS(void){
                 return NULL;
             }
             nvs_get_str(config->nvs_handle, DEVICE_NAME, device_name, &name_len);
+            // printf("device name from NVS: %s", device_name);
             strcpy(config->device_name, device_name);
             free(device_name);
         }
-        printf("device name lenght: %d\n", name_len);
+        // printf("device name lenght: %d\n", name_len);
+        // printf("init device name: %s", config->device_name);
     }
 
     found_key = true;
@@ -158,10 +89,13 @@ config_handel init_NVS(void){
                 return NULL;
             }
             nvs_get_str(config->nvs_handle, SERIAL_NAME, serial_name, &serial_len);
+            // printf("serial num from NVS: %s", serial_name);
             strcpy(config->serial_number, serial_name);
             free(serial_name);
         }
-        printf("serial lenght: %d\n", serial_len);
+        // printf("serial lenght: %d\n", serial_len);
+        // printf("init serial num: %s\n", config->serial_number);
+
     }
     err = nvs_commit(config->nvs_handle);
     if (err != ESP_OK)
@@ -182,12 +116,7 @@ char *getSerialNumber (config_handel config){
 }
 
 bool setDeviceName (char *new_device_name, config_handel config){
-    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &config->nvs_handle);
-    if (err != ESP_OK){
-        ESP_LOGE(TAG_NVS, "Could not open" NVS_NAMESPACE);
-        return NULL;
-    }
-    int new_len = find_arr_len(new_device_name);
+    int new_len = strlen(new_device_name);
     if (new_len <= 0){
         ESP_LOGE(TAG_NVS, "New device name is smaller than %d chars", 0);
         ESP_LOGW(TAG_NVS, "Will not set new device name");
@@ -197,6 +126,11 @@ bool setDeviceName (char *new_device_name, config_handel config){
         ESP_LOGE(TAG_NVS, "New device name is larger than %d chars", DEVICE_NAME_MAX_LEN);
         ESP_LOGW(TAG_NVS, "Will not set new device name");
         return false;
+    }
+    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &config->nvs_handle);
+    if (err != ESP_OK){
+        ESP_LOGE(TAG_NVS, "Could not open" NVS_NAMESPACE);
+        return NULL;
     }
     strcpy(config->device_name, new_device_name);
 
@@ -209,12 +143,7 @@ bool setDeviceName (char *new_device_name, config_handel config){
 }
 
 bool setSerialNumber (char *new_serial_number, config_handel config){
-    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &config->nvs_handle);
-    if (err != ESP_OK){
-        ESP_LOGE(TAG_NVS, "Could not open" NVS_NAMESPACE);
-        return false;
-    }
-    int new_len = find_arr_len(new_serial_number);
+    int new_len = strlen(new_serial_number);
     if (new_len <= 0){
         ESP_LOGE(TAG_NVS, "New serial number is smaller than %d chars", 0);
         ESP_LOGW(TAG_NVS, "Will not set new serial number");
@@ -225,9 +154,14 @@ bool setSerialNumber (char *new_serial_number, config_handel config){
         ESP_LOGW(TAG_NVS, "Will not set new serial number");
         return false;
     }
+    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &config->nvs_handle);
+    if (err != ESP_OK){
+        ESP_LOGE(TAG_NVS, "Could not open" NVS_NAMESPACE);
+        return NULL;
+    }
     strcpy(config->serial_number, new_serial_number);
 
-    esp_err_t status_err = nvs_set_str(config->nvs_handle, DEVICE_NAME, new_serial_number);
+    esp_err_t status_err = nvs_set_str(config->nvs_handle, SERIAL_NAME, new_serial_number);
     err = nvs_commit(config->nvs_handle);
     if (err != ESP_OK){ ESP_LOGE(TAG_NVS, "Failed to commit to NVS"); }
     nvs_close(config->nvs_handle);
