@@ -6,5 +6,16 @@
         "board/esp32-wrover-kit-3.3v.cfg"
     ],
     "idf.portWin": "COM8",
-    "idf.toolsPathWin": "C:\\Users\\Admin\\.espressif"
+    "idf.toolsPathWin": "C:\\Users\\Admin\\.espressif",
+    "files.associations": {
+        "freertos.h": "c",
+        "gpio.h": "c",
+        "esp_intr_alloc.h": "c",
+        "gpio_types.h": "c",
+        "esp_bit_defs.h": "c",
+        "gpio_num.h": "c",
+        "gpio_etm.h": "c",
+        "esp_etm.h": "c",
+        "esp_err.h": "c"
+    }
 }
