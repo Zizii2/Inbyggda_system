@@ -1,21 +1,14 @@
 #pragma once
-typedef struct screen_build{
-    bool is_8_bit_flag;
-    // int V0_value;
-    int RS_pin;
-    // int read_write_pin;
-    int *DB_arr;
-    int enable_pin;
-}screen_build;
+#include <stdio.h>
+#include <string.h>
+#include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/i2c_master.h"
 
-typedef struct screen_t{
-    int V0;
-    int RS;
-    int row;
-    int data_pin;
-    int mode;
-}screen_t;
+/*
+    TODO figure out if it nesseccery to send the pointer of the handle or if this works as well
+*/
+i2c_master_dev_handle_t oled_lcd_init(void);
 
-typedef screen_t *screen_ptr;
-
-screen_ptr init_screen(screen_build *);
+void oled_lcd_print(i2c_master_dev_handle_t oled_dev_handle);

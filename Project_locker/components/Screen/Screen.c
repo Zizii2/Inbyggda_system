@@ -1,48 +1,46 @@
-#include <stdio.h>
-#include <string.h>
-#include "driver/gpio.h"
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-// #include "hal/ledc_types.h"
-// #include "esp_lcd_panel_ops.h"
-// #include "esp_lcd_io_spi.h"
-// #include "esp_lcd_panel_vendor.h"
 #include "Screen.h"
 
-screen_ptr init_screen(screen_build *build)
-{
-    screen_ptr s = (screen_ptr)malloc(sizeof(screen_t));
-    memset(s, 0, sizeof(screen_t));
-    gpio_config_t DB_config = {
-        .intr_type = GPIO_INTR_DISABLE,
-        .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = (1ULL << build->DB_arr[0]) 
-                        || (1ULL << build->DB_arr[1])
-                        || (1ULL << build->DB_arr[2])
-                        || (1ULL << build->DB_arr[3])
-                        || (1ULL << build->DB_arr[4])
-                        || (1ULL << build->DB_arr[5])
-                        || (1ULL << build->DB_arr[6])
-                        || (1ULL << build->DB_arr[7]),
-        .pull_down_en = GPIO_PULLDOWN_ENABLE,
-        .pull_up_en = GPIO_PULLUP_DISABLE
+// if i2c_master_bus_handle_t is NULL create one, maybe have I2C struct which keeps track of master_bus_handle
+// and the device handles
+i2c_master_dev_handle_t oled_lcd_init(void){
+    // ! REMOVE LATER
+    // i2c_clock_source_t clk_src_t;
+
+    i2c_master_bus_handle_t master_handle;
+    // This just make sure the isn't already any master_bus_handles
+    esp_err_t err = i2c_master_get_bus_handle(0, &master_handle);
+    if(err != ESP_OK){
+        i2c_master_bus_config_t master_config = {
+            .i2c_port = 0, // Use `i2c_master_get_bus_handle()` when you need the master_bus_handle in another source file
+            .scl_io_num = GPIO_NUM_12,
+            .sda_io_num = GPIO_NUM_11,
+            .clk_source = I2C_CLK_SRC_XTAL,
+            .glitch_ignore_cnt = 7,
+            .intr_priority = 1,
+            // .trans_queue_depth (only in asynchronous transaction)
+            //! .allow_pd = true (this be set for light sleep integration, but not suppored on this chip)
+        };
+        i2c_new_master_bus(&master_config, &master_handle);
+    }
+
+    i2c_device_config_t oled_dev_config = {
+        .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+        .device_address = 0x28,
+        .scl_speed_hz = 200000,      // esp32 h2 max clk speed is 400khz
+        .scl_wait_us = 0,
     };
-    gpio_config(&DB_config);
-    //Start of init
-    vTaskDelay(pdMS_TO_TICKS(20));
-    gpio_set_level(build->DB_arr[5], 1);
-    gpio_set_level(build->DB_arr[4], 1);
-    vTaskDelay(pdMS_TO_TICKS(5));
-    gpio_set_level(build->DB_arr[5], 0);
-    gpio_set_level(build->DB_arr[4], 0);
-    gpio_set_level(build->DB_arr[3], 1);
-    vTaskDelay(pdMS_TO_TICKS(1));
-    gpio_set_level(build->DB_arr[4], 0);
-    gpio_set_level(build->DB_arr[0], 1);
-    vTaskDelay(pdMS_TO_TICKS(1));
-    gpio_set_level(build->DB_arr[0], 0);
-    gpio_set_level(build->DB_arr[2], 1); // det stog DB3 ska vara 1 (med det fanns två så jag gissar lite
-    //end of init
-    
-    return s;
+    i2c_master_dev_handle_t oled_dev_handle;
+    i2c_master_bus_add_device(master_handle, &oled_dev_config, &oled_dev_handle);
+
+    return oled_dev_handle;
+    /*
+        ! Antekningar för mig
+        ! Nu har jag en master_bus_handel och en device_handle
+        ! Use `i2c_master_get_bus_handle()` when you need the master_bus_handle in another source file
+    */
+}
+
+void oled_lcd_print(i2c_master_dev_handle_t oled_dev_handle){
+    uint8_t data_wr = 0x10;
+    i2c_master_transmit(oled_dev_handle, &data_wr, 100, -1);
 }
