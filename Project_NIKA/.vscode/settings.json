@@ -1,0 +1,21 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.espIdfPathWin": "c:\\Users\\Admin\\esp\\v5.4\\esp-idf",
+    "idf.pythonInstallPath": "C:\\Users\\Admin\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
+    "idf.openOcdConfigs": [
+        "board/esp32-wrover-kit-3.3v.cfg"
+    ],
+    "idf.portWin": "COM8",
+    "idf.toolsPathWin": "C:\\Users\\Admin\\.espressif",
+    "files.associations": {
+        "freertos.h": "c",
+        "gpio.h": "c",
+        "esp_intr_alloc.h": "c",
+        "gpio_types.h": "c",
+        "esp_bit_defs.h": "c",
+        "gpio_num.h": "c",
+        "gpio_etm.h": "c",
+        "esp_etm.h": "c",
+        "esp_err.h": "c"
+    }
+}

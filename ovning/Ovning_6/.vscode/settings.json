@@ -1,0 +1,13 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.espIdfPathWin": "C:\\Users\\Admin\\esp\\v5.4\\esp-idf",
+    "idf.openOcdConfigs": [
+        "board/esp32c6-ftdi.cfg"
+    ],
+    "idf.toolsPathWin": "C:\\Users\\Admin\\.espressif",
+    "idf.flashType": "UART",
+    "idf.portWin": "COM13",
+    "idf.customExtraVars": {
+        "IDF_TARGET": "esp32c6"
+    }
+}
