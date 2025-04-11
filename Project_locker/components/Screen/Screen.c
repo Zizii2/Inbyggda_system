@@ -36,6 +36,9 @@ i2c_master_dev_handle_t oled_lcd_init(i2c_master_bus_handle_t master_handle){
 }
 
 void oled_lcd_print(i2c_master_dev_handle_t oled_dev_handle){
+    /*
+    ! read https://docs.espressif.com/projects/esp-idf/en/stable/esp32h2/api-reference/peripherals/lcd/i2c_lcd.html
+    */
     uint8_t data_wr = 0x10;
     i2c_master_transmit(oled_dev_handle, &data_wr, 100, -1);
 }
