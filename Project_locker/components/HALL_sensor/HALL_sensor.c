@@ -9,7 +9,6 @@ HALL_handle init_hall(void){
     adc1_config_width(ADC_WIDTH_BIT_12);
     hall->buff_idx = 0;
     return hall;
-
 }
 
 int get_avg(HALL_handle hall){
