@@ -2,13 +2,14 @@
 #include "driver/gpio.h"
 #include "driver/adc.h"
 
-#define BUFF_SIZE 100
+#define BUFF_SIZE 1024
 
 typedef struct HALL_t{
     gpio_num_t src_pin;
     adc_channel_t channel;
     int buffert[BUFF_SIZE];
     int buff_idx;
+    bool initzi;
 }HALL_t;
 
 typedef HALL_t *HALL_handle;
