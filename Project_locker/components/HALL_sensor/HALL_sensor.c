@@ -22,3 +22,7 @@ void update_hall(hall_handle hall){
         hall->prev_val = value;
     }
 }
+
+int get_hall_val(hall_handle hall){
+    return hall->prev_val;
+}

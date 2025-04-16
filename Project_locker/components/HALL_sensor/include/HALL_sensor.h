@@ -9,5 +9,5 @@ typedef struct hall_t{
 typedef hall_t *hall_handle;
 
 void init_hall(gpio_num_t pin, hall_handle *out_handle);
-
 void update_hall(hall_handle hall);
+int get_hall_val(hall_handle hall);

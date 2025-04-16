@@ -1,11 +1,11 @@
 #include "Screen.h"
 
-lv_disp_t *oled_lcd_init(i2c_master_bus_handle_t master_handle){
+screen_handle oled_lcd_init(i2c_master_bus_handle_t master_handle, gpio_num_t scl_io, gpio_num_t sda_io){
     if(master_handle == NULL){
         i2c_master_bus_config_t master_config = {
             .i2c_port = 0, // Use `i2c_master_get_bus_handle()` when you need the master_bus_handle in another source file
-            .scl_io_num = GPIO_NUM_12,
-            .sda_io_num = GPIO_NUM_11,
+            .scl_io_num = scl_io,
+            .sda_io_num = sda_io,
             .clk_source = I2C_CLK_SRC_XTAL,
             .glitch_ignore_cnt = 7,
             .intr_priority = 1,
@@ -17,20 +17,6 @@ lv_disp_t *oled_lcd_init(i2c_master_bus_handle_t master_handle){
     else{
         ESP_ERROR_CHECK(i2c_master_get_bus_handle(0, &master_handle));
     }
-
-    // i2c_device_config_t oled_dev_config = {
-    //     .dev_addr_length = I2C_ADDR_BIT_LEN_7,
-    //     .device_address = 0x28,
-    //     .scl_speed_hz = 200000,      // esp32 h2 max clk speed is 400khz
-    //     .scl_wait_us = 0,
-    // };
-    // i2c_master_dev_handle_t oled_dev_handle;
-    // i2c_master_bus_add_device(master_handle, &oled_dev_config, &oled_dev_handle);
-    
-//!----------------------------------------------------------------------------------------------
-//!----------------------------------------------------------------------------------------------
-//!----------------------------------------------------------------------------------------------
-
 
     ESP_LOGI(TAG, "Install panel IO");
     esp_lcd_panel_io_handle_t io_handle = NULL;
@@ -58,11 +44,14 @@ lv_disp_t *oled_lcd_init(i2c_master_bus_handle_t master_handle){
     };
     panel_config.vendor_config = &ssd1306_config;
     ESP_ERROR_CHECK(esp_lcd_new_panel_ssd1306(io_handle, &panel_config, &panel_handle));
-
-
+    
+    
+    
+    ESP_LOGI("DEBUG", "hello\n\n");
     ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel_handle, true));
+    ESP_LOGI("DEBUG", "hello2\n\n");
 
     ESP_LOGI(TAG, "Initialize LVGL");
     const lvgl_port_cfg_t lvgl_cfg = ESP_LVGL_PORT_INIT_CONFIG();
@@ -84,19 +73,25 @@ lv_disp_t *oled_lcd_init(i2c_master_bus_handle_t master_handle){
     };
     lv_disp_t *disp = lvgl_port_add_disp(&disp_cfg);
     lv_disp_set_rotation(disp, LV_DISP_ROT_NONE);
-    // display_s *newDisp =pvPortMalloc(sizeof(display_s));
-    // newDisp->disp = disp;
-
-    return disp;
+    screen_handle screen = (screen_handle)malloc(sizeof(screen_t));
+    screen->disp = disp;
+    screen->label = NULL;
+    return screen;
 }
 
-void oled_lcd_print(lv_disp_t *disp, const char* txt){
-    ESP_LOGI(TAG, "Display LVGL Scroll Text");
-    lv_obj_t *scr = lv_disp_get_scr_act(disp);
-    lv_obj_t *label = lv_label_create(scr);
-    lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR); /* Circular scroll */
-    lv_label_set_text(label, txt);
+void oled_lcd_print(screen_handle screen, const char* txt){
+    // ESP_LOGI(TAG, "Display LVGL Scroll Text");
+    lv_obj_t *scr = lv_disp_get_scr_act(screen->disp);
+    if(screen->label == NULL){
+        screen->label = lv_label_create(scr);
+        ESP_LOGI("SCREEN", "new label");
+    }
+    else{
+        // ESP_LOGI("SCREEN", "same old label");
+    }
+    lv_label_set_long_mode(screen->label, LV_LABEL_LONG_SCROLL_CIRCULAR); /* Circular scroll */
+    lv_label_set_text(screen->label, txt);
     /* Size of the screen (if you use rotation 90 or 270, please use lv_display_get_vertical_resolution) */
-    lv_obj_set_width(label, 128);
-    lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 0);
+    lv_obj_set_width(screen->label, 128);
+    lv_obj_align(screen->label, LV_ALIGN_TOP_MID, 0, 0);
 }

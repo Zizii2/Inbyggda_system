@@ -56,14 +56,25 @@ void update_analog(Analog_led_handel led, TickType_t curr_time){
         ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
     }
     if(led->state == PWM_ON){
-        if(led->last_updated - curr_time < pdMS_TO_TICKS(5000)){ return; }
+        if(led->last_updated - curr_time < pdMS_TO_TICKS(100)){ return; }
         led->last_updated = xTaskGetTickCount();
-        if(led->duty + pwm_step > LEDC_DUTY_MAX){ led->state = CONST_STATE; }
+        if(led->duty + pwm_step > LEDC_DUTY_MAX){ led->state = CONST_STATE; return; }
         led->duty += pwm_step;
-        printf("duty: %.3f\n", led->duty);
+        // printf("duty: %.3f\n", led->duty);
         ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, led->duty);
         ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
     }
+    if(led->state == PWM_OFF){
+        if(led->last_updated - curr_time < pdMS_TO_TICKS(100)){ return; }
+        led->last_updated = xTaskGetTickCount();
+        if(led->duty - pwm_step < 0){ led->state = CONST_STATE; return; }
+        led->duty -= pwm_step;
+        // printf("duty: %.3f\n", led->duty);
+        ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, led->duty);
+        ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
+    }
+    ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, led->duty);
+    ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
 }
 
 void set_led_analog(Analog_led_handel led, int value ){
@@ -104,6 +115,11 @@ double find_angel(double curr_duty){
 void pwm_on_analog(Analog_led_handel led){
     printf("state change\n");
     led->state=PWM_ON;
-    led->duty = 0;
+    led->last_updated = xTaskGetTickCount();
+}
+
+void pwm_off_analog(Analog_led_handel led){
+    printf("state change\n");
+    led->state=PWM_OFF;
     led->last_updated = xTaskGetTickCount();
 }

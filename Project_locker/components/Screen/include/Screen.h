@@ -34,6 +34,12 @@
 #define LCD_CMD_BITS           8
 #define LCD_PARAM_BITS         8
 
-lv_disp_t *oled_lcd_init(i2c_master_bus_handle_t master_handle);
+typedef struct screen_t{
+    lv_disp_t * disp;
+    lv_obj_t *label;
+}screen_t;
 
-void oled_lcd_print(lv_disp_t *disp, const char* txt);
+typedef screen_t* screen_handle;
+
+screen_handle oled_lcd_init(i2c_master_bus_handle_t master_handle, gpio_num_t scl_io, gpio_num_t sda_io);
+void oled_lcd_print(screen_handle screen, const char* txt);

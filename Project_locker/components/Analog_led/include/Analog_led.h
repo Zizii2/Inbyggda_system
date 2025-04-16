@@ -8,7 +8,7 @@
 
 #define LEDC_TIMER              LEDC_TIMER_0
 #define LEDC_MODE               LEDC_LOW_SPEED_MODE
-#define LEDC_CHANNEL            LEDC_CHANNEL_0
+#define LEDC_CHANNEL            LEDC_CHANNEL_1
 #define LEDC_DUTY_RES           LEDC_TIMER_13_BIT // Set duty resolution to 13 bits
 #define LEDC_DUTY_MAX           (8192.0)
 #define LEDC_FREQUENCY          (4000) // Frequency in Hertz. Set frequency at 4 kHz
@@ -16,7 +16,7 @@
 #define STEP_OF_PERIOD          (0.01)
 #define ANGEL_INCREASE          (0.05)
 
-#define pwm_step                (1)
+#define pwm_step                (100)
 
 static enum Analog_led_state_t{ CONST_STATE=0, SIN_STATE=1, PWM_ON=2, PWM_OFF=3};
 
@@ -43,3 +43,4 @@ void update_analog(Analog_led_handel led, TickType_t curr_time);
 void set_led_analog(Analog_led_handel led, int new_value );
 void sin_analog(Analog_led_handel led, int new_period);
 void pwm_on_analog(Analog_led_handel led);
+void pwm_off_analog(Analog_led_handel led);
