@@ -9,7 +9,7 @@ Analog_led_handel init_analog(Analog_led_config* led_config){
     gpio_config_t pin_config = {
         .intr_type = GPIO_INTR_DISABLE,
         .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = 1ULL << led_config->output_pin,
+        .pin_bit_mask = (1ULL << led_config->output_pin),
         .pull_down_en = GPIO_PULLDOWN_ENABLE,
         .pull_up_en = GPIO_PULLUP_DISABLE
     };

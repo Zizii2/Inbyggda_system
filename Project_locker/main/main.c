@@ -12,8 +12,8 @@
 #include "Piezo_speaker.h"
 
 void app_main(void){
-    // lv_disp_t *disp = oled_lcd_init(NULL);
-    // oled_lcd_print(disp, "Hello world");
+    lv_disp_t *disp = oled_lcd_init(NULL);
+    oled_lcd_print(disp, "Hello world");
     // Buzz_config buzz_cfg = {
     //     .channel = BUZZ_CHANNEL,
     //     .duty = 0,
@@ -21,25 +21,29 @@ void app_main(void){
     // };
     // Buzz_handle buzz = init_buzz(&buzz_cfg);
 
-    // Analog_led_config led_config = {
-    //     .channel = LEDC_CHANNEL_1,
-    //     .output_pin = GPIO_NUM_12,
-    //     .duty = 0,
-    // };
-    // Analog_led_handel led1 = init_analog(&led_config);
-    HALL_handle hall = init_hall();
+    Analog_led_config led_config = {
+        .channel = LEDC_CHANNEL_0,
+        .output_pin = GPIO_NUM_22,
+        .duty = 0,
+    };
+    Analog_led_handel led1 = init_analog(&led_config);
+
+    // hall_handle hall = NULL;
+    // init_hall(GPIO_NUM_27, &hall);
     while(1){
         // make_noise(buzz);
 
-        // set_led_analog(led1, 0);
+        set_led_analog(led1, 0);
         // update_analog(led1, xTaskGetTickCount());
 
-        update_hall(hall);
+        // update_hall();
         // printf("update cycle\n");
 
-        vTaskDelay(pdMS_TO_TICKS(50));
+        vTaskDelay(pdMS_TO_TICKS(1000));
     //     printf("lamp change\n");
-        // set_led_analog(led1, 4000);
+        set_led_analog(led1, 4000);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+
     }
 
     return;

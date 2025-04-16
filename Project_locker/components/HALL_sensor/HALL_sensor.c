@@ -1,37 +1,24 @@
 #include <stdio.h>
 #include "HALL_sensor.h"
 
-HALL_handle init_hall(void){
-    int pin = 1;
-    HALL_handle hall = (HALL_handle)calloc(1, sizeof(HALL_t));
-    if(hall == NULL){ return NULL; }
-    adc1_config_channel_atten(pin, ADC_ATTEN_DB_2_5);
-    adc1_config_width(ADC_WIDTH_BIT_12);
-    hall->buff_idx = 0;
-    hall->initzi = true;
-    return hall;
+void init_hall(gpio_num_t pin, hall_handle *out_handle){
+   gpio_config_t cfg = {
+        .intr_type = GPIO_INTR_DISABLE,
+        .mode = GPIO_MODE_INPUT,
+        .pin_bit_mask = (1ULL << pin),
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+   };
+   gpio_config(&cfg);
+   hall_handle handle = (hall_handle)malloc(sizeof(hall_t));
+   handle->pin = pin;
+   handle->prev_val = 1;
+   *out_handle = handle;
 }
 
-int get_avg(HALL_handle hall){
-    int avg = 0;
-    for(int i=0; i<BUFF_SIZE; i++){
-        avg += hall->buffert[i];
-    }
-    return avg/BUFF_SIZE;
-}
-
-void update_hall(HALL_handle hall){
-    if(hall->initzi){
-        hall->initzi = false;
-        for(int i=0; i< BUFF_SIZE; i++){
-            int value = adc1_get_raw(hall->channel);
-            hall->buffert[i] = value;
-        }
-    }
-    else{
-        int value = adc1_get_raw(hall->channel);
-        hall->buffert[hall->buff_idx++] = value;
-        if(hall->buff_idx >= BUFF_SIZE){ hall->buff_idx = 0; }
-        printf("value: %d\n", get_avg(hall));
+void update_hall(hall_handle hall){
+    int value = gpio_get_level(hall->pin);
+    if(value != hall->prev_val){
+        hall->prev_val = value;
     }
 }

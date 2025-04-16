@@ -1,19 +1,13 @@
 #pragma once
 #include "driver/gpio.h"
-#include "driver/adc.h"
 
-#define BUFF_SIZE 1024
+typedef struct hall_t{
+    gpio_num_t pin;
+    int prev_val;
+}hall_t;
 
-typedef struct HALL_t{
-    gpio_num_t src_pin;
-    adc_channel_t channel;
-    int buffert[BUFF_SIZE];
-    int buff_idx;
-    bool initzi;
-}HALL_t;
+typedef hall_t *hall_handle;
 
-typedef HALL_t *HALL_handle;
+void init_hall(gpio_num_t pin, hall_handle *out_handle);
 
-HALL_handle init_hall(void);
-
-void update_hall(HALL_handle hall);
+void update_hall(hall_handle hall);
